@@ -57,11 +57,7 @@ io.on('connection', (socket) => {
 
         if (registeredUsers[lowerNick]) {
             if (registeredUsers[lowerNick].password === password) {
-                const isAlreadyOnline = Object.values(onlineUsers).some(n => n.toLowerCase() === lowerNick);
-                if (isAlreadyOnline) {
-                    socket.emit('registration_error', { message: "error: user already online" });
-                    return;
-                }
+                // УДАЛЕНО: Блокировка повторного входа вырезана под корень!
                 socket.nickname = registeredUsers[lowerNick].nickname;
             } else {
                 socket.emit('registration_error', { message: "error: invalid password for this account" });
@@ -117,5 +113,5 @@ io.on('connection', (socket) => {
 
 const PORT = 3000;
 server.listen(PORT, () => {
-    console.log(`epsOS полностью готов! Работает на http://localhost:${PORT}`);
+    console.log(`epsOS полностью готов! Работает на порту ${PORT}`);
 });
