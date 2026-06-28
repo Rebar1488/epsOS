@@ -57,7 +57,6 @@ io.on('connection', (socket) => {
 
         if (registeredUsers[lowerNick]) {
             if (registeredUsers[lowerNick].password === password) {
-                // УДАЛЕНО: Блокировка повторного входа вырезана под корень!
                 socket.nickname = registeredUsers[lowerNick].nickname;
             } else {
                 socket.emit('registration_error', { message: "error: invalid password for this account" });
@@ -99,15 +98,15 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Отдаем историю чейнджлога ТОЛЬКО по запросу от авторизованного юзера
     socket.on('request_history', () => {
         socket.emit('history_log', loadChangelog());
     });
 
-    socket.on('send_broadcast', (data) => {
-        const sender = socket.nickname || 'UNKNOWN';
+   socket.on('send_broadcast', (data) => {
+        const sender = 'IV'; 
         saveMessage(sender, data.text);
         io.emit('receive_broadcast', { from: sender, text: data.text });
+    });
     });
 });
 
