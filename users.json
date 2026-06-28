@@ -2,13 +2,4 @@
   "iv": {
     "nickname": "IV",
     "password": "springtrap228"
-  },
-  "test": {
-    "nickname": "test",
-    "password": "123"
-  },
-  "test2": {
-    "nickname": "test2",
-    "password": "123"
   }
-}
