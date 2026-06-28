@@ -109,13 +109,15 @@ const usersListDisplay = document.getElementById('usersListDisplay');
 const messageList = document.getElementById('messageList');
 const adminPanel = document.getElementById('adminPanel');
 
-
+// Ставим заглушку для гостей при первой загрузке страницы
 messageList.innerHTML = '<div style="color: #666; font-style: italic;">Зайдите в аккаунт, чтобы увидеть все.</div>';
 
+// Открытие и закрытие формы по кнопке Sign_Up
 openFormBtn.addEventListener('click', function() {
     regForm.style.display = (regForm.style.display === 'block') ? 'none' : 'block';
 });
 
+// Отправка данных на сервер по кнопке register
 submitRegBtn.addEventListener('click', function() {
     const nickname = document.getElementById('nicknameInput').value.trim();
     const password = document.getElementById('passwordInput').value.trim();
@@ -127,6 +129,7 @@ submitRegBtn.addEventListener('click', function() {
     socket.emit('register_user', { nickname, password });
 });
 
+// Успешный вход
 socket.on('registration_success', function(data) {
     myNickname = data.nickname;
     document.getElementById('currentNick').textContent = "nickname: " + myNickname;
@@ -136,9 +139,11 @@ socket.on('registration_success', function(data) {
     changeNickBtn.style.display = 'inline-block';
     logoutBtn.style.display = 'inline-block';
     
+    // Просим у сервера историю, так как мы залогинились
     messageList.innerHTML = 'Загрузка директив...';
     socket.emit('request_history'); 
     
+    // Проверка на твой ник IV для открытия админки
     if (myNickname.toLowerCase() === 'iv') {
         adminPanel.style.display = 'block';
     } else {
@@ -146,10 +151,12 @@ socket.on('registration_success', function(data) {
     }
 });
 
+// Если сервер вернул ошибку (например, неверный пароль)
 socket.on('registration_error', function(data) {
     alert(data.message);
 });
 
+// Кнопка Log_Out
 logoutBtn.addEventListener('click', function() {
     socket.emit('logout_user');
     
@@ -167,6 +174,7 @@ logoutBtn.addEventListener('click', function() {
     messageList.innerHTML = '<div style="color: #666; font-style: italic;">Зайдите в аккаунт, чтобы увидеть все.</div>';
 });
 
+// Кнопка Change_Nick
 changeNickBtn.addEventListener('click', function() {
     const newNick = prompt("Введите новый никнейм:", myNickname);
     if (newNick && newNick.trim() !== "") {
@@ -174,6 +182,7 @@ changeNickBtn.addEventListener('click', function() {
     }
 });
 
+// Успешное изменение ника
 socket.on('nick_changed_success', function(data) {
     myNickname = data.newNickname;
     document.getElementById('currentNick').textContent = "nickname: " + myNickname;
@@ -185,6 +194,7 @@ socket.on('nick_changed_success', function(data) {
     }
 });
 
+// Обновление списка онлайн-пользователей в столбик
 socket.on('update_users', function(usersArray) {
     if (usersArray.length === 0) {
         usersListDisplay.innerHTML = "<div>*None</div>";
@@ -198,6 +208,7 @@ socket.on('update_users', function(usersArray) {
     }
 });
 
+// Отправка сообщений по кнопке SEND
 document.getElementById('sendBroadcast').addEventListener('click', function() {
     const text = document.getElementById('broadcastInput').value.trim();
     if (text) {
@@ -206,6 +217,7 @@ document.getElementById('sendBroadcast').addEventListener('click', function() {
     }
 });
 
+// Функция, которая красиво добавляет одну строчку на экран
 function appendMessage(from, text) {
     if (messageList.textContent.includes('Зайдите в аккаунт') || messageList.textContent === 'Загрузка директив...') {
         messageList.innerHTML = '';
@@ -216,12 +228,14 @@ function appendMessage(from, text) {
     messageList.scrollTop = messageList.scrollHeight;
 }
 
+// Получение ОДНОГО нового сообщения в реальном времени
 socket.on('receive_broadcast', function(data) {
     if (myNickname !== "guest") {
         appendMessage(data.from, data.text);
     }
 });
 
+// Получение ВСЕЙ ИСТОРИИ от сервера
 socket.on('history_log', function(historyArray) {
     if (myNickname !== "guest") {
         if (historyArray.length > 0) {
